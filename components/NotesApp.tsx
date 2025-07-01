@@ -17,6 +17,7 @@ const FormatButton: React.FC<{ onClick: () => void; title: string; children: Rea
 const NotesApp: React.FC = () => {
     const [notes, setNotes] = useState<Note[]>([]);
     const [activeNoteId, setActiveNoteId] = useState<string | null>(null);
+    const [searchQuery, setSearchQuery] = useState('');
     const fileInputRef = useRef<HTMLInputElement>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const [selection, setSelection] = useState<{ start: number; end: number } | null>(null);
@@ -55,6 +56,14 @@ const NotesApp: React.FC = () => {
         }
     }, [selection]);
 
+    const filteredNotes = useMemo(() => {
+        if (!searchQuery) {
+            return notes;
+        }
+        return notes.filter(note => 
+            note.content.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+    }, [notes, searchQuery]);
 
     const activeNote = useMemo(() => {
         return notes.find(note => note.id === activeNoteId) || null;
@@ -68,6 +77,7 @@ const NotesApp: React.FC = () => {
         };
         setNotes(prevNotes => [newNote, ...prevNotes]);
         setActiveNoteId(newNote.id);
+        setSearchQuery(''); // Clear search to show the new note
     };
 
     const handleDeleteNote = (idToDelete: string) => {
@@ -202,9 +212,18 @@ const NotesApp: React.FC = () => {
                         <button onClick={handleDownload} className="w-full text-center p-2 rounded-lg bg-black/40 hover:bg-white/20 transition-all duration-200 text-sm">Download & Clear</button>
                         <input type="file" ref={fileInputRef} onChange={handleFileChange} accept=".json" className="hidden" />
                     </div>
+                    <div className="mt-4">
+                        <input
+                            type="text"
+                            placeholder="Search notes..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full p-2 bg-black/50 text-white rounded-lg border border-white/20 focus:outline-none focus:ring-2 focus:ring-purple-400 placeholder-gray-400"
+                        />
+                    </div>
                 </div>
                 <div className="overflow-y-auto">
-                    {notes.map(note => (
+                    {filteredNotes.map(note => (
                         <div
                             key={note.id}
                             onClick={() => setActiveNoteId(note.id)}
@@ -217,7 +236,11 @@ const NotesApp: React.FC = () => {
                             <p className="text-xs text-gray-400 mt-1">{new Date(note.lastModified).toLocaleString()}</p>
                         </div>
                     ))}
-                    {notes.length === 0 && <p className="p-4 text-center text-gray-400">No notes yet.</p>}
+                    {filteredNotes.length === 0 && (
+                        <p className="p-4 text-center text-gray-400">
+                           {searchQuery ? 'No notes match your search.' : 'No notes yet.'}
+                        </p>
+                    )}
                 </div>
             </aside>
             <main className="w-2/3 flex flex-col">

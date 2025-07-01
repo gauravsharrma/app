@@ -1,6 +1,6 @@
 import React from 'react';
 
-export type AppId = 'markdown' | 'converter' | 'notes';
+export type AppId = 'markdown' | 'converter' | 'notes' | 'prompt-generator';
 
 export interface AppInfo { 
   id: AppId; 

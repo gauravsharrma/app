@@ -3,13 +3,16 @@ import Sidebar from './components/Sidebar';
 import MarkdownReader from './components/MarkdownReader';
 import UnitConverter from './components/UnitConverter';
 import NotesApp from './components/NotesApp';
+import PromptGenerator from './components/PromptGenerator';
 import { AppId } from './types';
 
 const App: React.FC = () => {
-  const [activeApp, setActiveApp] = useState<AppId>('markdown');
+  const [activeApp, setActiveApp] = useState<AppId>('prompt-generator');
 
   const renderActiveApp = () => {
     switch (activeApp) {
+      case 'prompt-generator':
+        return <PromptGenerator />;
       case 'markdown':
         return <MarkdownReader />;
       case 'converter':
@@ -17,7 +20,7 @@ const App: React.FC = () => {
       case 'notes':
         return <NotesApp />;
       default:
-        return <MarkdownReader />;
+        return <PromptGenerator />;
     }
   };
 
